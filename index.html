@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="A tiny responsive single-file page that says 'Hello Space' — built with Tailwind CSS." />
+  <title>Hello Space</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config: enable custom fonts & extend colors if desired
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue'],
+          },
+          keyframes: {
+            twinkle: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.15)' }
+            },
+            float: {
+              '0%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-8px)' },
+              '100%': { transform: 'translateY(0px)' }
+            }
+          },
+          animation: {
+            'twinkle-slow': 'twinkle 6s infinite ease-in-out',
+            'float-slow': 'float 6s ease-in-out infinite'
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Minimal CSS for the starfield canvas fallback and reduced-motion handling */
+    :root { --bg1: #020617; --bg2: #04102b; }
+    html,body,#app { height: 100%; }
+
+    /* Decorative star layers using CSS gradients for small payload and nice visuals */
+    .star-layer {
+      position: absolute;
+      inset: 0;
+      background-repeat: repeat;
+      pointer-events: none;
+      will-change: transform, opacity;
+      mix-blend-mode: screen;
+    }
+
+    .stars-1 { background-image: radial-gradient(#ffffff 1px, transparent 1.5px); background-size: 20px 20px; opacity: 0.45; transform: translateZ(0); }
+    .stars-2 { background-image: radial-gradient(#d0eaff 1px, transparent 1.6px); background-size: 40px 40px; opacity: 0.25; filter: blur(0.6px); }
+    .stars-3 { background-image: radial-gradient(#9cc7ff 1px, transparent 1.7px); background-size: 80px 80px; opacity: 0.12; filter: blur(1.2px); }
+
+    /* Planet ring effect */
+    .planet-ring { mix-blend-mode: screen; }
+
+    /* Respect user preference for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .stars-1, .stars-2, .stars-3 { animation: none !important; }
+      .planet { animation: none !important; }
+    }
+
+    /* Print style: simple text only */
+    @media print {
+      body * { visibility: hidden; }
+      #printable, #printable * { visibility: visible; }
+      #printable { position: absolute; left: 0; top: 0; }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-[#020617] via-[#071B2D] to-[#04102b] min-h-screen text-slate-100 font-display">
+  <div id="app" class="relative flex items-center justify-center min-h-screen px-6 py-12">
+
+    <!-- Star layers -->
+    <div aria-hidden="true" class="star-layer stars-1 animate-[twinkle_6s_infinite_ease-in-out]" style="transform: translate3d(0,0,0);"></div>
+    <div aria-hidden="true" class="star-layer stars-2 animate-[twinkle_8s_infinite_ease-in-out]" style="transform: translate3d(-30px,10px,0);"></div>
+    <div aria-hidden="true" class="star-layer stars-3 animate-[twinkle_10s_infinite_ease-in-out]" style="transform: translate3d(20px,-15px,0);"></div>
+
+    <!-- Main card -->
+    <main id="printable" role="main" class="relative z-10 w-full max-w-3xl text-center">
+      <div class="mx-auto p-6 sm:p-10 bg-gradient-to-r from-[#08122a]/60 via-[#071733]/40 to-[#0b1b34]/60 backdrop-blur-md rounded-3xl shadow-2xl border border-white/5">
+        <div class="flex items-center justify-center space-x-4">
+          <!-- Planet Icon -->
+          <div class="w-20 h-20 sm:w-28 sm:h-28 flex-none">
+            <svg class="planet animate-float-slow" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Planet graphic">
+              <defs>
+                <radialGradient id="g1" cx="30%" cy="30%">
+                  <stop offset="0%" stop-color="#77b6ff" />
+                  <stop offset="100%" stop-color="#1b3b6a" />
+                </radialGradient>
+                <radialGradient id="g2" cx="50%" cy="40%">
+                  <stop offset="0%" stop-color="#ffd57e" stop-opacity="0.9" />
+                  <stop offset="100%" stop-color="#ff8a4c" stop-opacity="0.15" />
+                </radialGradient>
+              </defs>
+              <circle cx="60" cy="60" r="36" fill="url(#g1)" />
+              <ellipse class="planet-ring" cx="60" cy="66" rx="56" ry="18" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6" />
+              <circle cx="46" cy="50" r="5" fill="url(#g2)" opacity="0.95" />
+            </svg>
+          </div>
+
+          <!-- Title -->
+          <div class="text-left">
+            <h1 class="text-4xl sm:text-6xl leading-tight font-extrabold tracking-tight">Hello Space</h1>
+            <p class="mt-1 text-sm sm:text-base text-slate-300">A tiny responsive page that greets the cosmos.</p>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 justify-center">
+          <button id="copyBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-white/8 hover:bg-white/12 transition text-sm font-medium border border-white/6 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400" aria-label="Copy greeting">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16h8M8 12h8M8 8h8M3 20h18M3 4h18" />
+            </svg>
+            Copy
+          </button>
+
+          <button id="shareBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-500 transition text-sm font-medium shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400" aria-label="Share greeting">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v14" />
+            </svg>
+            Share
+          </button>
+
+          <button id="themeBtn" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-white/6 hover:bg-white/12 transition text-sm font-medium border border-white/6 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400" aria-pressed="false" aria-label="Toggle dark mode">
+            <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M1 12h1M22 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7M12 7a5 5 0 100 10 5 5 0 000-10z" />
+            </svg>
+            Toggle theme
+          </button>
+        </div>
+
+        <p class="mt-4 text-xs text-slate-400">Tip: Use your browser's share dialog or copy the greeting to your clipboard. Works offline — single-file, fast and small.</p>
+      </div>
+
+      <footer class="mt-6 text-center text-xs text-slate-500">
+        <span>Built with ♥ using Tailwind CSS • Single-file demo</span>
+      </footer>
+    </main>
+  </div>
+
+  <noscript>
+    <div class="fixed inset-4 sm:inset-8 bg-white/5 text-center rounded-lg p-4 text-sm text-yellow-200">
+      JavaScript is disabled in your browser. The page still displays "Hello Space" but interactive features (share/copy) require JavaScript to be enabled.
+    </div>
+  </noscript>
+
+  <script>
+    (function () {
+      const copyBtn = document.getElementById('copyBtn');
+      const shareBtn = document.getElementById('shareBtn');
+      const themeBtn = document.getElementById('themeBtn');
+      const themeIcon = document.getElementById('themeIcon');
+      const GREETING = 'Hello Space';
+
+      // Copy to clipboard with fallback
+      copyBtn.addEventListener('click', async function () {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(GREETING);
+          } else {
+            // Fallback: create textarea
+            const t = document.createElement('textarea');
+            t.value = GREETING;
+            t.setAttribute('readonly', '');
+            t.style.position = 'absolute';
+            t.style.left = '-9999px';
+            document.body.appendChild(t);
+            t.select();
+            document.execCommand('copy');
+            document.body.removeChild(t);
+          }
+          showTemporaryLabel(copyBtn, 'Copied!');
+        } catch (err) {
+          showTemporaryLabel(copyBtn, 'Copy failed');
+          console.error('Copy failed', err);
+        }
+      });
+
+      // Web Share API with graceful fallback (copies)
+      shareBtn.addEventListener('click', async function () {
+        const shareData = { title: 'Hello Space', text: GREETING, url: window.location.href };
+        if (navigator.share) {
+          try {
+            await navigator.share(shareData);
+          } catch (err) {
+            // User probably cancelled
+            console.info('Share canceled or failed', err);
+          }
+        } else {
+          // Fallback to copy
+          try {
+            await navigator.clipboard.writeText(`${GREETING} — ${window.location.href}`);
+            showTemporaryLabel(shareBtn, 'Copied link');
+          } catch (err) {
+            showTemporaryLabel(shareBtn, 'Share not supported');
+          }
+        }
+      });
+
+      // Theme toggle: light/dark by toggling 'light' class on html
+      function setTheme(isLight) {
+        document.documentElement.classList.toggle('light', isLight);
+        themeBtn.setAttribute('aria-pressed', String(isLight));
+        // Update icon (sun-like when light, moon-like when dark)
+        if (isLight) {
+          themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1M12 20v1M4.2 4.2l.7.7M19.1 19.1l.7.7M1 12h1M22 12h1M4.2 19.8l.7-.7M19.1 4.9l.7-.7M12 7a5 5 0 100 10 5 5 0 000-10z" />';
+        } else {
+          themeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />';
+        }
+      }
+
+      // Initialize theme based on stored preference or system
+      const stored = localStorage.getItem('hello-space-theme');
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      const isLight = stored ? stored === 'light' : prefersLight;
+      setTheme(isLight);
+
+      themeBtn.addEventListener('click', function () {
+        const nowLight = !document.documentElement.classList.contains('light');
+        setTheme(nowLight);
+        localStorage.setItem('hello-space-theme', nowLight ? 'light' : 'dark');
+      });
+
+      // Simple helper to show temporary label on button
+      function showTemporaryLabel(btn, label) {
+        const original = btn.innerHTML;
+        btn.innerHTML = `<span class=\"inline-flex items-center gap-2\">${label}</span>`;
+        setTimeout(() => { btn.innerHTML = original; }, 1500);
+      }
+
+      // Small accessibility: focus visible polyfill style (if :focus-visible not available)
+      try {
+        const style = document.createElement('style');
+        style.innerHTML = `:focus { outline: none; } button:focus { box-shadow: 0 0 0 3px rgba(99,102,241,0.3); }`;
+        document.head.appendChild(style);
+      } catch (e) {}
+
+      // Make sure the greeting is announced by screen readers on load
+      const sr = document.createElement('div');
+      sr.setAttribute('aria-live', 'polite');
+      sr.setAttribute('aria-atomic', 'true');
+      sr.className = 'sr-only';
+      sr.style.position = 'absolute';
+      sr.style.left = '-9999px';
+      sr.textContent = GREETING;
+      document.body.appendChild(sr);
+    })();
+  </script>
+</body>
+</html>
